@@ -1,6 +1,5 @@
-﻿using System.Net;
+﻿using System.Text;
 using HardwareStreaming.Configuration.Models;
-using HardwareStreaming.Enums;
 using HardwareStreaming.Loggin;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -9,6 +8,19 @@ namespace HardwareStreaming.Configuration;
 
 public static class YamlConfigurationManager
 {
+    private const string DEFAULT_YAML_CONFIG_FILE_TEMPLATE = 
+        "kafka_domain_configuration:\n" +
+        "  bootstrap_server: localhost:9092\n" +
+        "  client_id: HardwareProducer1\n" +
+        "  topic: hardware_streaming\n" +
+        "hardware_monitoring:\n" +
+        "  - Cpu\n" +
+        "  - Gpu\n" +
+        "  - Mainboard\n" +
+        "  - Network\n" +
+        "  - Ram\n" +
+        "delay_stream_time: 300";
+    
     /// <summary>
     /// Load the configuration file.
     /// If the file not exist, will return false.
@@ -42,5 +54,21 @@ public static class YamlConfigurationManager
         }
         
         return configurationFile;
+    }
+    public static YamlConfigurationFile? CreateDefault(string filePath, ILogger logger)
+    {
+        logger.LogInformation($"Creating a new configuration file in {filePath}...");
+        if(File.Exists(filePath))
+                logger.LogWarning("A file already exists in the specified path, so it will be overwritten.");
+        
+        using (FileStream yamlWriter = new(filePath, FileMode.Create, FileAccess.Write))
+        {
+            using StreamWriter streamWriter = new(yamlWriter, Encoding.UTF8, DEFAULT_YAML_CONFIG_FILE_TEMPLATE.Length);
+            streamWriter.WriteLine(DEFAULT_YAML_CONFIG_FILE_TEMPLATE);
+            
+            logger.LogInformation($"A new configuration file has been created on {filePath}.");
+        }
+
+        return LoadFromFile(filePath, logger);
     }
 }

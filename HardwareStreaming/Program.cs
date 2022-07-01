@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using HardwareStreaming.ArgsHandling;
 using HardwareStreaming.Configuration;
 using HardwareStreaming.Configuration.Models;
 using HardwareStreaming.Domains;
@@ -12,24 +13,28 @@ namespace HardwareStreaming;
 static class Program
 {
     private static KafkaDomain kafkaDomain { get; set; } = null!;
-    private static YamlConfigurationFile configurationFile { get; set; } = null!;
+    private static YamlConfigurationFile? configurationFile { get; set; }
 
     public static void Main(string[] args)
     {
         Logger logger = new();
         logger.InitGlobalLogger();
-        
-        string configFilepath = args.Length > 0 ? args[0] : Consts.DEFAULT_CONFIGURATION_PATH;
-        YamlConfigurationFile? yamlConfigurationFile = YamlConfigurationManager
-            .LoadFromFile(configFilepath, logger);
-        
+        ArgsHandler argsHandler = new(args);
+        argsHandler.Parse();
+        argsHandler.configFilePathIndex ??= Consts.DEFAULT_CONFIGURATION_PATH;
+
+        YamlConfigurationFile? yamlConfigurationFile = argsHandler.flags!.Contains(ArgsFlags.CreateConfigFile) ?
+            YamlConfigurationManager.CreateDefault(argsHandler.configFilePathIndex, logger) : 
+            YamlConfigurationManager.LoadFromFile(argsHandler.configFilePathIndex, logger);
+
         if(yamlConfigurationFile is null)
         {
-            logger.LogFatal("The configuration file don't exist in " + configFilepath);
+            logger.LogFatal("The configuration file don't exist in " + argsHandler.configFilePathIndex);
             Environment.Exit(1);   
         }
-        else configurationFile = yamlConfigurationFile;
         
+        configurationFile = yamlConfigurationFile;
+
         List<HardwareCatagory> monitoringHardware = configurationFile.hardwareMonitoring;
 
         #region Components Builder

@@ -1,5 +1,5 @@
 ﻿using HardwareStreaming.Enums;
-using OpenHardwareMonitor.Hardware;
+using LibreHardwareMonitor.Hardware;
 
 namespace HardwareStreaming.Hardware;
 
@@ -19,7 +19,8 @@ public sealed class GPU : HardwareWraper
         HARDWARE_TYPE = gpuType switch
         {
             GpuType.Nvidia => HardwareType.GpuNvidia,
-            GpuType.ATI => HardwareType.GpuAti,
+            GpuType.Intel => HardwareType.GpuIntel,
+            GpuType.Amd => HardwareType.GpuAmd
         };
 
         UpdateComponents();

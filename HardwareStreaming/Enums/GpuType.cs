@@ -1,3 +1,3 @@
 ﻿namespace HardwareStreaming.Enums;
 
-public enum GpuType { Nvidia, ATI }
+public enum GpuType { Nvidia, Intel, Amd }

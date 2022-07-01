@@ -1,8 +1,8 @@
-﻿using OpenHardwareMonitor.Hardware;
+﻿using LibreHardwareMonitor.Hardware;
 
 namespace HardwareStreaming.Hardware;
 
-public sealed class FanController : HardwareWraper
+public sealed class EmbeddedController : HardwareWraper
 {
     public override HardwareType HARDWARE_TYPE { get; }
     protected override IHardware _hardware { get; }
@@ -12,7 +12,7 @@ public sealed class FanController : HardwareWraper
     public override IHardware parent { get; set; }
     public override ISensor[] sensors { get; set; }
 
-    public FanController(IHardware hardware)
+    public EmbeddedController(IHardware hardware)
     {
         _hardware = hardware;
         

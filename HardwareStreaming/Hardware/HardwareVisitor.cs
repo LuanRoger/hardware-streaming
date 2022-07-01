@@ -1,5 +1,5 @@
 ﻿using HardwareStreaming.Loggin;
-using OpenHardwareMonitor.Hardware;
+using LibreHardwareMonitor.Hardware;
 
 namespace HardwareStreaming.Hardware;
 
@@ -14,9 +14,9 @@ public class HardwareVisitor : IVisitor
     
     public void VisitComputer(IComputer computer)
     {
-        _logger.LogInformation($"New computer visited: CPU: {computer.CPUEnabled}\nMainboard: {computer.MainboardEnabled}\n" +
-                               $"GPU: {computer.GPUEnabled}\nNetwork: {computer.NetworkEnabled}\nFan Controller: {computer.FanControllerEnabled}\n" +
-                               $"HDD: {computer.HDDEnabled}\nRAM: {computer.RAMEnabled}");
+        _logger.LogInformation($"New computer visited: CPU: {computer.IsCpuEnabled}\nMainboard: {computer.IsMotherboardEnabled}\n" +
+                               $"GPU: {computer.IsGpuEnabled}\nNetwork: {computer.IsNetworkEnabled}\nFan Controller: {computer.IsControllerEnabled}\n" +
+                               $"HDD: {computer.IsStorageEnabled}\nRAM: {computer.IsMemoryEnabled}");
         computer.Traverse(this);
     }
 

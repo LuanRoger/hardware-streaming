@@ -1,10 +1,10 @@
-﻿using OpenHardwareMonitor.Hardware;
+﻿using LibreHardwareMonitor.Hardware;
 
 namespace HardwareStreaming.Hardware;
 
 public sealed class Mainboard : HardwareWraper
 {
-    public override HardwareType HARDWARE_TYPE => HardwareType.Mainboard;
+    public override HardwareType HARDWARE_TYPE => HardwareType.Motherboard;
     protected override IHardware _hardware { get; }
     public override string name { get; set; }
     public override Identifier identifier { get; set; }

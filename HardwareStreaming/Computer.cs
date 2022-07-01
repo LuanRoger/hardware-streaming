@@ -1,6 +1,6 @@
 ﻿using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware;
-using OpenHardwareMonitor.Hardware;
+using LibreHardwareMonitor.Hardware;
 using ILogger = HardwareStreaming.Loggin.ILogger;
 // ReSharper disable InconsistentNaming
 
@@ -8,14 +8,14 @@ namespace HardwareStreaming;
 
 public class Computer : IDisposable
 {
-    private OpenHardwareMonitor.Hardware.Computer _computer { get; }
+    private LibreHardwareMonitor.Hardware.Computer _computer { get; }
     private ILogger _logger { get; set; }
 
     private CPU? _cpu { get; set; }
     private Mainboard? _mainboard { get; set; }
     private GPU? _gpu { get; set; }
     private Network? _network { get; set; }
-    private FanController? _fanController { get; set; }
+    private EmbeddedController? _fanController { get; set; }
     private RAM? _ram { get; set; }
     private HDD? _hdd { get; set; }
 
@@ -23,13 +23,13 @@ public class Computer : IDisposable
     {
         _computer = new()
         {
-            CPUEnabled = computerConfiguration.initCpu,
-            MainboardEnabled = computerConfiguration.initMainboard,
-            GPUEnabled = computerConfiguration.initGpu,
-            NetworkEnabled = computerConfiguration.initNetwork,
-            FanControllerEnabled = computerConfiguration.initFanController,
-            HDDEnabled = computerConfiguration.initHdd,
-            RAMEnabled = computerConfiguration.initRam
+            IsCpuEnabled = computerConfiguration.initCpu,
+            IsMotherboardEnabled = computerConfiguration.initMainboard,
+            IsGpuEnabled = computerConfiguration.initGpu,
+            IsNetworkEnabled = computerConfiguration.initNetwork,
+            IsControllerEnabled = computerConfiguration.initFanController,
+            IsStorageEnabled = computerConfiguration.initHdd,
+            IsMemoryEnabled = computerConfiguration.initRam
         };
         _logger = logger;
         
@@ -43,39 +43,50 @@ public class Computer : IDisposable
     private void GetHardwares()
     {
         //CPU
-        if(_computer.CPUEnabled)
+        if(_computer.IsCpuEnabled)
         {
-            IHardware? cpuHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.CPU);
+            IHardware? cpuHardware = _computer.Hardware
+                .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Cpu);
             if(cpuHardware is null)
                 _logger.LogWarning($"{nameof(cpuHardware)} can't be found, so it's null");
             else _cpu = new(cpuHardware); 
         }
         
         //Mainboard
-        if(_computer.MainboardEnabled)
+        if(_computer.IsMotherboardEnabled)
         {
-            IHardware? mainboardHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Mainboard);
+            IHardware? mainboardHardware = _computer.Hardware
+                .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Motherboard);
             if(mainboardHardware is null)
                 _logger.LogWarning($"{nameof(mainboardHardware)} can't be found, so it's null");
             else _mainboard = new(mainboardHardware);
         }
         
         //GPU
-        if(_computer.GPUEnabled)
+        if(_computer.IsGpuEnabled)
         {
-            IHardware? gpuHardwareAti = _computer.Hardware
-                .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.GpuAti);
             IHardware? gpuHardwareNvidia = _computer.Hardware
                 .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.GpuNvidia);
-            
-            if(gpuHardwareAti is null && gpuHardwareNvidia is null)
-                _logger.LogWarning($"{nameof(gpuHardwareAti)} or ${nameof(gpuHardwareNvidia)} can't be found, so it's null");
-            else _gpu = gpuHardwareAti is null ? new(gpuHardwareNvidia!, GpuType.Nvidia) :
-                new(gpuHardwareAti, GpuType.ATI);
+            IHardware? gpuHardwareIntel = _computer.Hardware
+                .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.GpuIntel);
+            IHardware? gpuHardwareAmd = _computer.Hardware
+                .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.GpuAmd);
+
+            if(gpuHardwareNvidia is null && gpuHardwareIntel is null && gpuHardwareAmd is null)
+                _logger.LogWarning($"{nameof(gpuHardwareIntel)} or ${nameof(gpuHardwareAmd)} can't be found, so it's null");
+            else
+            {
+                if(gpuHardwareNvidia is not null)
+                    _gpu = new(gpuHardwareNvidia, GpuType.Nvidia);
+                else if(gpuHardwareIntel is not null)
+                    _gpu = new(gpuHardwareIntel, GpuType.Intel);
+                else if(gpuHardwareAmd is not null) 
+                    _gpu = new(gpuHardwareAmd!, GpuType.Amd);
+            }
         }
         
         //Network
-        if(_computer.NetworkEnabled)
+        if(_computer.IsNetworkEnabled)
         {
             IHardware? networkHardware = _computer.Hardware
                 .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Network);
@@ -86,9 +97,9 @@ public class Computer : IDisposable
         }
         
         //FanController
-        if(_computer.FanControllerEnabled)
+        if(_computer.IsControllerEnabled)
         {
-            IHardware? fanControllerHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Heatmaster);
+            IHardware? fanControllerHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.EmbeddedController);
             
             if(fanControllerHardware is null)
                 _logger.LogWarning($"{nameof(fanControllerHardware)} can't be found, so it's null");
@@ -96,9 +107,9 @@ public class Computer : IDisposable
         }
         
         //RAM
-        if(_computer.RAMEnabled)
+        if(_computer.IsMemoryEnabled)
         {
-            IHardware? ramHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.RAM);
+            IHardware? ramHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Memory);
             
             if(ramHardware is null)
                 _logger.LogWarning($"{nameof(ramHardware)} can't be found, so it's null");
@@ -106,9 +117,9 @@ public class Computer : IDisposable
         }
         
         //HDD
-        if(_computer.HDDEnabled)
+        if(_computer.IsStorageEnabled)
         {
-            IHardware? hddHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.HDD);
+            IHardware? hddHardware = _computer.Hardware.FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Storage);
             
             if(hddHardware is null)
                 _logger.LogWarning($"{nameof(hddHardware)} can't be found, so it's null");

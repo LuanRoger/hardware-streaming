@@ -1,4 +1,5 @@
-﻿using HardwareStreaming.Configuration;
+﻿using Confluent.Kafka;
+using HardwareStreaming.Configuration;
 using HardwareStreaming.Configuration.Models;
 using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
@@ -78,7 +79,8 @@ static class Program
         kafkaDomain = new(new()
         {
             BootstrapServers = configurationFile.kafkaDomainConfiguration.bootstrapServer,
-            ClientId = configurationFile.kafkaDomainConfiguration.clientId
+            ClientId = configurationFile.kafkaDomainConfiguration.clientId,
+            Partitioner = Partitioner.Consistent
         }, logger, configurationFile.kafkaDomainConfiguration.topic);
         
         ComputerConfiguration computerConfiguration = computerBuilder.Build();

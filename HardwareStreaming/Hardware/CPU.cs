@@ -1,11 +1,11 @@
-﻿using OpenHardwareMonitor.Hardware;
+﻿using LibreHardwareMonitor.Hardware;
 // ReSharper disable InconsistentNaming
 
 namespace HardwareStreaming.Hardware;
 
 public sealed class CPU : HardwareWraper
 {
-    public override HardwareType HARDWARE_TYPE => HardwareType.CPU;
+    public override HardwareType HARDWARE_TYPE => HardwareType.Cpu;
     protected override IHardware _hardware { get; }
     public override string name { get; set; }
     public override Identifier identifier { get; set; }

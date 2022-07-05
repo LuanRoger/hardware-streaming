@@ -1,4 +1,4 @@
 kafka_domain_configuration:
   server: localhost
-  port: 9092
+  port: "9092"
   topic: hardware_streaming

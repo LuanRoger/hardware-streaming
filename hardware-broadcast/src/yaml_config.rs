@@ -1,25 +1,25 @@
 pub mod yaml_configuration {
     use std::fs::File;
-    use std::io::{Write, Error, BufReader, BufRead, Read};
+    use std::io::{Write, Error, Read};
     use std::path::Path;
 
-    use yaml_rust::{YamlLoader, YamlEmitter};
+    use yaml_rust::{YamlLoader};
     extern crate yaml_rust;
 
     const DEFAULT_CONFIG_PATH: &str = "./hardware-broadcast-config.yaml";
 
-    struct KafkaDomainConfigModel {
-        server: String,
-        port: String,
-        topic: String
+    pub struct KafkaDomainConfigModel {
+        pub server: String,
+        pub port: String,
+        pub topic: String
     }
     impl KafkaDomainConfigModel {
         pub fn new(server: String, port: String, topic: String) -> KafkaDomainConfigModel {
             KafkaDomainConfigModel { server: server, port: port, topic: topic }
         }
     }
-    struct YamlConfigModel {
-        kafkaConfig: KafkaDomainConfigModel
+    pub struct YamlConfigModel {
+        pub kafkaConfig: KafkaDomainConfigModel
     }
     impl YamlConfigModel {
         pub fn new(kafkaConfig: KafkaDomainConfigModel) -> YamlConfigModel {
@@ -27,7 +27,7 @@ pub mod yaml_configuration {
         }
     }
 
-    pub fn init_configs() -> Result<(), Error> {
+    pub fn init_configs() -> Result<YamlConfigModel, Error> {
         let file_exist = Path::new(DEFAULT_CONFIG_PATH).is_file();
         let mut yaml_file = if file_exist { File::open(DEFAULT_CONFIG_PATH)? } 
             else { File::create(DEFAULT_CONFIG_PATH)? };
@@ -40,9 +40,10 @@ pub mod yaml_configuration {
             file_text_buffer = create_default_config_model();
             write!(&mut yaml_file, "{}", file_text_buffer)?;
         }
-        load_from_yaml(file_text_buffer);
+        let kafka_config: KafkaDomainConfigModel = load_from_yaml(file_text_buffer);
+        let final_config: YamlConfigModel = YamlConfigModel::new(kafka_config);
 
-        Ok(())
+        Ok(final_config)
     }
 
     fn load_from_yaml(text: String) -> KafkaDomainConfigModel {

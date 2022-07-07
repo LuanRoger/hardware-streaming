@@ -20,7 +20,37 @@ public static class YamlConfigurationManager
         "  - Network\n" +
         "  - Ram\n" +
         "delay_stream_time: 300";
-    
+
+    #region ConfigFileStreamingUtils
+    private interface IFileModeStreamer
+    {
+        string Stream(string filePath);
+    }
+    private class CreateReadDefault : IFileModeStreamer
+    {
+        public string Stream(string filePath)
+        {
+            int buffersSize = DEFAULT_YAML_CONFIG_FILE_TEMPLATE.Length;
+            
+            using FileStream fileStream = new(filePath, FileMode.Create, FileAccess.Write);
+            using StreamWriter streamWriter = new(fileStream, Encoding.UTF8, buffersSize);
+            streamWriter.Write(DEFAULT_YAML_CONFIG_FILE_TEMPLATE);
+
+            return DEFAULT_YAML_CONFIG_FILE_TEMPLATE;
+        }
+    }
+    private class ReadFile : IFileModeStreamer
+    {
+        public string Stream(string filePath)
+        {
+            using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            using StreamReader streamReader = new(filePath, Encoding.UTF8);
+            
+            return streamReader.ReadToEnd();
+        }
+    }
+    #endregion
+
     /// <summary>
     /// Load the configuration file.
     /// If the file not exist, will return false.
@@ -28,15 +58,29 @@ public static class YamlConfigurationManager
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    public static YamlConfigurationFile? LoadFromFile(string filePath, ILogger logger)
+    public static YamlConfigurationFile? LoadConfigFile(string filePath, ILogger logger, bool create = false)
     {
-        if(!File.Exists(filePath))
+        bool fileExist = File.Exists(filePath);
+        if(!fileExist && !create)
         {
             logger.LogError($"The configuration file not exists in {filePath}");
             return null;
         }
         
-        string yamlText = File.ReadAllText(filePath);
+        string yamlText = string.Empty;
+        if(create)
+        {
+            logger.LogInformation($"Creating a new configuration file in {filePath}...");
+            if(fileExist)
+                logger.LogInformation("The specified file already exists, so it will be overwritten.");
+            yamlText = new CreateReadDefault().Stream(filePath);
+        }
+        else
+        {
+            logger.LogInformation($"Loading the configuration file in {filePath}...");
+            yamlText = new ReadFile().Stream(filePath);
+        }
+
         IDeserializer deserialized = new DeserializerBuilder()
             .WithNamingConvention(UnderscoredNamingConvention.Instance)
             .Build();
@@ -54,21 +98,5 @@ public static class YamlConfigurationManager
         }
         
         return configurationFile;
-    }
-    public static YamlConfigurationFile? CreateDefault(string filePath, ILogger logger)
-    {
-        logger.LogInformation($"Creating a new configuration file in {filePath}...");
-        if(File.Exists(filePath))
-                logger.LogWarning("A file already exists in the specified path, so it will be overwritten.");
-        
-        using (FileStream yamlWriter = new(filePath, FileMode.Create, FileAccess.Write))
-        {
-            using StreamWriter streamWriter = new(yamlWriter, Encoding.UTF8, DEFAULT_YAML_CONFIG_FILE_TEMPLATE.Length);
-            streamWriter.WriteLine(DEFAULT_YAML_CONFIG_FILE_TEMPLATE);
-            
-            logger.LogInformation($"A new configuration file has been created on {filePath}.");
-        }
-
-        return LoadFromFile(filePath, logger);
     }
 }

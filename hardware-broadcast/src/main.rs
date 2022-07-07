@@ -27,8 +27,11 @@ fn main() {
         for message_set in consumer.poll().unwrap().iter() {
             for message in message_set.messages() {
                 let message_key = str::from_utf8(message.key).unwrap();
-                let message_value: [u8; 4] = [message.value[0], message.value[1], message.value[2], message.value[3]];
-                println!("New message: Key [{}]; Value [{}]", message_key, f32::from_le_bytes(message_value));
+                let message_value = str::from_utf8(message.value).unwrap();
+
+                let value_result = message_value.replace(",", ".").parse::<f32>().unwrap();
+
+                println!("New message: Key [{}]; Value [{}]", message_key, value_result);
             }
             _ = consumer.consume_messageset(message_set);
         }

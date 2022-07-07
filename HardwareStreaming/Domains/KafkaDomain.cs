@@ -17,14 +17,14 @@ public class KafkaDomain
         kafkaTopic = kafkaTopicName;
     }
 
-    public void StreamInfo(KeyValuePair<string, double> idValuePair, in IProducer<string, double> producer)
+    public void StreamInfo(KeyValuePair<string, double> idValuePair, in IProducer<string, string> producer)
     {
         (string key, double value) = idValuePair;
         
-        producer.Produce(kafkaTopic, new() {Key = key, Value = value}, DeliveryHandler);
+        producer.Produce(kafkaTopic, new() {Key = key, Value = value.ToString("0.00")}, DeliveryHandler);
     }
 
-    private void DeliveryHandler(DeliveryReport<string, double> report)
+    private void DeliveryHandler(DeliveryReport<string, string> report)
     {
         if(report.Error.Code != ErrorCode.NoError)
             _logger.LogError($"A error occurs: Code {report.Error.Code}; Reason: {report.Error.Reason}");

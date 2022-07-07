@@ -22,7 +22,7 @@ public class HardwareStreamer
 
     public void PulseStream(int flushTimeout)
     {
-        using var producer = new ProducerBuilder<string, double>(_domain.producerConfig).Build();
+        using var producer = new ProducerBuilder<string, string>(_domain.producerConfig).Build();
         foreach (IComponentLog component in componentsLog)
         {
             component.Log(_logger, _computer, out var toStream);

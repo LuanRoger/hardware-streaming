@@ -19,17 +19,14 @@ static class Program
     {
         Logger logger = new();
         logger.InitGlobalLogger();
-        ArgsHandler argsHandler = new(args);
-        argsHandler.Parse();
-        argsHandler.configFilePathIndex ??= Consts.DEFAULT_CONFIGURATION_PATH;
+        CmdArgsHandler cmdArgsHandler = new(args);
+        ArgsOptions argsOptions = cmdArgsHandler.Parse();
 
-        YamlConfigurationFile? yamlConfigurationFile = argsHandler.flags!.Contains(ArgsFlags.CreateConfigFile) ?
-            YamlConfigurationManager.CreateDefault(argsHandler.configFilePathIndex, logger) : 
-            YamlConfigurationManager.LoadFromFile(argsHandler.configFilePathIndex, logger);
+        YamlConfigurationFile? yamlConfigurationFile = YamlConfigurationManager.LoadConfigFile(argsOptions.fileConfigPath, logger, argsOptions.createConfigFile);
 
         if(yamlConfigurationFile is null)
         {
-            logger.LogFatal("The configuration file don't exist in " + argsHandler.configFilePathIndex);
+            logger.LogFatal($"The configuration file don't exist in {argsOptions.fileConfigPath}");
             Environment.Exit(1);   
         }
         
@@ -100,7 +97,7 @@ static class Program
             
             Console.WriteLine("Do you want to exit? [y/n] (default: n)");
             ConsoleKeyInfo keyInfo = Console.ReadKey();
-            cancel = keyInfo.Key == ConsoleKey.Y;
+            cancel = keyInfo.Key != ConsoleKey.Y;
             e.Cancel = cancel;
 
             if (e.Cancel)

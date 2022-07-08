@@ -9,15 +9,15 @@ namespace HardwareStreaming;
 public class Computer : IDisposable
 {
     private LibreHardwareMonitor.Hardware.Computer _computer { get; }
-    private ILogger _logger { get; set; }
+    private ILogger _logger { get; }
 
-    private CPU? _cpu { get; set; }
-    private Mainboard? _mainboard { get; set; }
-    private GPU? _gpu { get; set; }
-    private Network? _network { get; set; }
-    private EmbeddedController? _fanController { get; set; }
-    private RAM? _ram { get; set; }
-    private HDD? _hdd { get; set; }
+    public CPU? cpu { get; set; }
+    public Mainboard? mainboard { get; set; }
+    public GPU? gpu { get; set; }
+    public Network? network { get; set; }
+    public EmbeddedController? fanController { get; set; }
+    public RAM? ram { get; set; }
+    public HDD? hdd { get; set; }
 
     public Computer(ComputerConfiguration computerConfiguration, ILogger logger)
     {
@@ -49,7 +49,7 @@ public class Computer : IDisposable
                 .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Cpu);
             if(cpuHardware is null)
                 _logger.LogWarning($"{nameof(cpuHardware)} can't be found, so it's null");
-            else _cpu = new(cpuHardware); 
+            else cpu = new(cpuHardware); 
         }
         
         //Mainboard
@@ -59,7 +59,7 @@ public class Computer : IDisposable
                 .FirstOrDefault(hardware => hardware.HardwareType == HardwareType.Motherboard);
             if(mainboardHardware is null)
                 _logger.LogWarning($"{nameof(mainboardHardware)} can't be found, so it's null");
-            else _mainboard = new(mainboardHardware);
+            else mainboard = new(mainboardHardware);
         }
         
         //GPU
@@ -77,11 +77,11 @@ public class Computer : IDisposable
             else
             {
                 if(gpuHardwareNvidia is not null)
-                    _gpu = new(gpuHardwareNvidia, GpuType.Nvidia);
+                    gpu = new(gpuHardwareNvidia, GpuType.Nvidia);
                 else if(gpuHardwareIntel is not null)
-                    _gpu = new(gpuHardwareIntel, GpuType.Intel);
+                    gpu = new(gpuHardwareIntel, GpuType.Intel);
                 else if(gpuHardwareAmd is not null) 
-                    _gpu = new(gpuHardwareAmd!, GpuType.Amd);
+                    gpu = new(gpuHardwareAmd!, GpuType.Amd);
             }
         }
         
@@ -93,7 +93,7 @@ public class Computer : IDisposable
             
             if(networkHardware is null)
                 _logger.LogWarning($"{nameof(networkHardware)} can't be found, so it's null");
-            else _network = new(networkHardware);
+            else network = new(networkHardware);
         }
         
         //FanController
@@ -103,7 +103,7 @@ public class Computer : IDisposable
             
             if(fanControllerHardware is null)
                 _logger.LogWarning($"{nameof(fanControllerHardware)} can't be found, so it's null");
-            else _fanController = new(fanControllerHardware);
+            else fanController = new(fanControllerHardware);
         }
         
         //RAM
@@ -113,7 +113,7 @@ public class Computer : IDisposable
             
             if(ramHardware is null)
                 _logger.LogWarning($"{nameof(ramHardware)} can't be found, so it's null");
-            else _ram = new(ramHardware);
+            else ram = new(ramHardware);
         }
         
         //HDD
@@ -123,98 +123,21 @@ public class Computer : IDisposable
             
             if(hddHardware is null)
                 _logger.LogWarning($"{nameof(hddHardware)} can't be found, so it's null");
-            else _hdd = new(hddHardware);
+            else hdd = new(hddHardware);
         }
     }
     
     public void UpdateAllComponents()
     {
-        _cpu?.UpdateComponents();
-        _mainboard?.UpdateComponents();
-        _gpu?.UpdateComponents();
-        _network?.UpdateComponents();
-        _fanController?.UpdateComponents();
-        _ram?.UpdateComponents();
-        _hdd?.UpdateComponents();
+        cpu?.UpdateComponents();
+        mainboard?.UpdateComponents();
+        gpu?.UpdateComponents();
+        network?.UpdateComponents();
+        fanController?.UpdateComponents();
+        ram?.UpdateComponents();
+        hdd?.UpdateComponents();
     }
     
-    public Dictionary<string, double> GetSensorInfos(HardwareCatagory hardwareCatagory)
-    {
-        Dictionary<string, double> nameValueSensor = new();
-
-        switch (hardwareCatagory)
-        {
-            case HardwareCatagory.Cpu:
-                if(_cpu is null) break;
-                
-                foreach (ISensor sensor in _cpu.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, (double)sensor.Value!); }
-                    catch(Exception e) { _logger.LogWarning(e.Message); }
-                }
-                break;
-            case HardwareCatagory.Mainboard:
-                if(_mainboard is null) break;
-                
-                foreach (ISensor sensor in _mainboard.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, (double)sensor.Value!); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
-                break;
-            case HardwareCatagory.Gpu:
-                if(_gpu is null) break;
-                
-                foreach (ISensor sensor in _gpu.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, (double)sensor.Value!); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
-                break;
-            case HardwareCatagory.Network:
-                if(_network is null) break;
-                
-                foreach (ISensor sensor in _network.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, (double)sensor.Value!); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
-                break;
-            case HardwareCatagory.FanController:
-                if(_fanController is null) break;
-                
-                foreach (ISensor sensor in _fanController.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, (double)sensor.Value!); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
-                break;
-            case HardwareCatagory.Ram:
-                if(_ram is null) break;
-                
-                foreach (ISensor sensor in _ram.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, (double)sensor.Value!); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
-                break;
-            case HardwareCatagory.Hdd:
-                if(_hdd is null) break;
-                
-                foreach (ISensor sensor in _hdd.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, (double)sensor.Value!); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
-                break;
-            default:
-                _logger.LogError($"{nameof(hardwareCatagory)} is null");
-                break;
-        }
-        
-        return nameValueSensor; 
-    }
-
     public void Dispose()
     {
         _computer.Close();

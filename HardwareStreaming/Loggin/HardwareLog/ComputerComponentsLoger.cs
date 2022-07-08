@@ -1,112 +1,75 @@
 ﻿using HardwareStreaming.Enums;
+using HardwareStreaming.Hardware.HardwareUtils;
 
 namespace HardwareStreaming.Loggin.HardwareLog;
 
 public class CpuLog : IComponentLog
 {
-    public void Log(ILogger logger, in Computer computer, out Dictionary<string, double> logedInfos)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
-        logedInfos = new();
-        
         logger.LogInformation("===CPU======================");
-        foreach ((string key, double value) in computer.GetSensorInfos(HardwareCatagory.Cpu))
-        {
+        foreach ((string key, double value) in toStream)
             logger.LogInformation($"{key}: {value}");
-            logedInfos.Add(key, value);
-        }
         logger.LogInformation("============================");
     }
 }
 public class MainboardLog : IComponentLog
 {
-    public void Log(ILogger logger, in Computer computer, out Dictionary<string, double> logedInfos)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
-        logedInfos = new();
-        
-        logger.LogInformation("===CPU======================");
-        foreach ((string key, double value) in computer.GetSensorInfos(HardwareCatagory.Mainboard))
-        {
+        logger.LogInformation("===Mainboard================");
+        foreach ((string key, double value) in toStream)
             logger.LogInformation($"{key}: {value}");
-            logedInfos.Add(key, value);
-        }
         logger.LogInformation("============================");
     }
 }
 public class GpuLog : IComponentLog
 {
-    public void Log(ILogger logger, in Computer computer, out Dictionary<string, double> logedInfos)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
-        logedInfos = new();
-        
         logger.LogInformation("===GPU======================");
-        foreach ((string key, double value) in computer.GetSensorInfos(HardwareCatagory.Gpu))
-        {
+        foreach ((string key, double value) in toStream)
             logger.LogInformation($"{key}: {value}");
-            logedInfos.Add(key, value);
-        }
         logger.LogInformation("============================");
     }
 }
 public class NetworkLog : IComponentLog
 {
-    public void Log(ILogger logger, in Computer computer, out Dictionary<string, double> logedInfos)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
-        logedInfos = new();
-        
         logger.LogInformation("===Network==================");
-        foreach ((string key, double value) in computer.GetSensorInfos(HardwareCatagory.Network))
-        {
+        foreach ((string key, double value) in toStream)
             logger.LogInformation($"{key}: {value}");
-            logedInfos.Add(key, value);
-        }
-            
         logger.LogInformation("============================");
     }
 }
 public class FanContollerLog : IComponentLog
 {
-    public void Log(ILogger logger, in Computer computer, out Dictionary<string, double> logedInfos)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
-        logedInfos = new();
-        
         logger.LogInformation("===Fan Controller===========");
-        foreach ((string key, double value) in computer.GetSensorInfos(HardwareCatagory.FanController))
-        {
+        foreach ((string key, double value) in toStream)
             logger.LogInformation($"{key}: {value}");
-            logedInfos.Add(key, value);
-        }
-            
         logger.LogInformation("============================");
     }
 }
 public class RamLog : IComponentLog
 {
-    public void Log(ILogger logger, in Computer computer, out Dictionary<string, double> logedInfos)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
-        logedInfos = new();
-        
         logger.LogInformation("===RAM======================");
-        foreach ((string key, double value) in computer.GetSensorInfos(HardwareCatagory.Ram))
-        {
+        foreach ((string key, double value) in toStream)
             logger.LogInformation($"{key}: {value}");
-            logedInfos.Add(key, value);
-        }
         logger.LogInformation("============================");
     }
 }
 public class HddLog : IComponentLog
 {
-    public void Log(ILogger logger, in Computer computer, out Dictionary<string, double> logedInfos)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
-        logedInfos = new();
-        
         logger.LogInformation("===HDD======================");
-        foreach ((string key, double value) in computer.GetSensorInfos(HardwareCatagory.Hdd))
-        {
+        foreach ((string key, double value) in toStream)
             logger.LogInformation($"{key}: {value}");
-            logedInfos.Add(key, value);
-        }
-            
         logger.LogInformation("============================");
     }
 }

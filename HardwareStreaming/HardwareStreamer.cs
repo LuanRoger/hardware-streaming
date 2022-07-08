@@ -1,5 +1,7 @@
 ﻿using Confluent.Kafka;
 using HardwareStreaming.Domains;
+using HardwareStreaming.Enums;
+using HardwareStreaming.Hardware.HardwareUtils;
 using HardwareStreaming.Loggin;
 using HardwareStreaming.Loggin.HardwareLog;
 
@@ -7,29 +9,68 @@ namespace HardwareStreaming;
 
 public class HardwareStreamer
 {
-    public List<IComponentLog> componentsLog { get; }
-    private Computer _computer { get; }
+    private Dictionary<HardwareCatagory, IComponentLog> _componentsLog { get; }
+    private List<HardwareCatagory> _hardwareToStream { get; }
+    private HardwareInfoExtractor _infoExtractor { get; }
     private KafkaDomain _domain { get; }
     private ILogger _logger { get; }
 
-    public HardwareStreamer(ILogger logger, Computer computer, List<IComponentLog> componentsLog, KafkaDomain domain)
+    public HardwareStreamer(ILogger logger, HardwareInfoExtractor infoExtractor,
+        List<HardwareCatagory> hardwareToStream, KafkaDomain domain)
     {
         _logger = logger;
-        _computer = computer;
-        this.componentsLog = componentsLog;
+        _infoExtractor = infoExtractor;
+        _hardwareToStream = hardwareToStream;
         _domain = domain;
+
+        _componentsLog = new();
+        InitComponentLoggers();
+    }
+    private void InitComponentLoggers()
+    {
+        foreach (HardwareCatagory hardwareCatagory in _hardwareToStream)
+        {
+            switch (hardwareCatagory)
+            {
+                case HardwareCatagory.Cpu:
+                    _componentsLog.Add(HardwareCatagory.Cpu, new CpuLog());
+                    break;
+                case HardwareCatagory.Mainboard:
+                    _componentsLog.Add(HardwareCatagory.Mainboard, new MainboardLog());
+                    break;
+                case HardwareCatagory.Gpu:
+                    _componentsLog.Add(HardwareCatagory.Gpu, new GpuLog());
+                    break;
+                case HardwareCatagory.Network:
+                    _componentsLog.Add(HardwareCatagory.Network, new NetworkLog());
+                    break;
+                case HardwareCatagory.FanController:
+                    _componentsLog.Add(HardwareCatagory.FanController, new FanContollerLog());
+                    break;
+                case HardwareCatagory.Ram:
+                    _componentsLog.Add(HardwareCatagory.Ram, new RamLog());
+                    break;
+                case HardwareCatagory.Hdd:
+                    _componentsLog.Add(HardwareCatagory.Hdd, new HddLog());
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }   
     }
 
-    public void PulseStream(int flushTimeout)
+    public void PulseStream()
     {
         using var producer = new ProducerBuilder<string, string>(_domain.producerConfig).Build();
-        foreach (IComponentLog component in componentsLog)
+        foreach (HardwareCatagory hardware in _hardwareToStream)
         {
-            component.Log(_logger, _computer, out var toStream);
-            foreach (var sensorInfos in toStream)
-                _domain.StreamInfo(sensorInfos, in producer);
+            var sensorInfos = _infoExtractor.GetSensorInfos(hardware);
+            
+            _componentsLog[hardware].Log(_logger, sensorInfos);
+            foreach (var sensorInfo in sensorInfos)
+                _domain.StreamInfo(sensorInfo, in producer);
+            
+            producer.Flush();
         }
-        
-        producer.Flush();
     }
 }

@@ -17,9 +17,9 @@ public class KafkaDomain
         kafkaTopic = kafkaTopicName;
     }
 
-    public void StreamInfo(KeyValuePair<string, double> idValuePair, in IProducer<string, string> producer)
+    public void StreamInfo(KeyValuePair<string, float> idValuePair, in IProducer<string, string> producer)
     {
-        (string key, double value) = idValuePair;
+        (string key, float value) = idValuePair;
         
         producer.Produce(kafkaTopic, new() {Key = key, Value = value.ToString("0.00")}, DeliveryHandler);
     }

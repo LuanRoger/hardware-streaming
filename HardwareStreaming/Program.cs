@@ -5,6 +5,7 @@ using HardwareStreaming.Configuration.Models;
 using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.Constructor;
+using HardwareStreaming.Hardware.HardwareUtils;
 using HardwareStreaming.Loggin;
 using HardwareStreaming.Loggin.HardwareLog;
 
@@ -22,60 +23,33 @@ static class Program
         CmdArgsHandler cmdArgsHandler = new(args);
         ArgsOptions argsOptions = cmdArgsHandler.Parse();
 
-        YamlConfigurationFile? yamlConfigurationFile = YamlConfigurationManager.LoadConfigFile(argsOptions.fileConfigPath, logger, argsOptions.createConfigFile);
-
+        YamlConfigurationFile? yamlConfigurationFile = YamlConfigurationManager
+            .LoadConfigFile(argsOptions.fileConfigPath, logger, argsOptions.createConfigFile);
         if(yamlConfigurationFile is null)
         {
             logger.LogFatal($"The configuration file don't exist in {argsOptions.fileConfigPath}");
             Environment.Exit(1);   
         }
-        
         configurationFile = yamlConfigurationFile;
 
         List<HardwareCatagory> monitoringHardware = configurationFile.hardwareMonitoring;
-
         #region Components Builder
         ComputerBuilder computerBuilder = new();
         List<IComponentLog> componentLogs = new();
         if(monitoringHardware.Contains(HardwareCatagory.Cpu))
-        {
             computerBuilder.InitCPU();
-            componentLogs.Add(new CpuLog());
-        }
         if(monitoringHardware.Contains(HardwareCatagory.Mainboard))
-        {
             computerBuilder.InitMainboard();
-            componentLogs.Add(new MainboardLog());
-        }
-            
         if(monitoringHardware.Contains(HardwareCatagory.Gpu))
-        {
             computerBuilder.InitGPU();
-            componentLogs.Add(new GpuLog());
-        }
-            
         if(monitoringHardware.Contains(HardwareCatagory.Network))
-        {
             computerBuilder.InitNetwork();
-            componentLogs.Add(new NetworkLog());
-        }
         if(monitoringHardware.Contains(HardwareCatagory.FanController))
-        {
             computerBuilder.InitFanController();
-            componentLogs.Add(new FanContollerLog());
-        }
-            
         if(monitoringHardware.Contains(HardwareCatagory.Ram))
-        {
             computerBuilder.InitRAM();
-            componentLogs.Add(new RamLog());
-        }
-            
         if(monitoringHardware.Contains(HardwareCatagory.Hdd))
-        {
             computerBuilder.InitHDD();
-            componentLogs.Add(new HddLog());
-        }
         #endregion
         
         kafkaDomain = new(new()
@@ -86,8 +60,8 @@ static class Program
         }, logger, configurationFile.kafkaDomainConfiguration.topic);
         
         ComputerConfiguration computerConfiguration = computerBuilder.Build();
-        Computer computer = new(computerConfiguration, logger);
-        HardwareStreamer hardwareStreamer = new(logger, computer, componentLogs, kafkaDomain);
+        HardwareInfoExtractor hardwareInfoExtractor = new(new(computerConfiguration, logger), logger);
+        HardwareStreamer hardwareStreamer = new(logger, hardwareInfoExtractor, monitoringHardware, kafkaDomain);
 
         bool cancel = false;
         bool paused = false;
@@ -106,7 +80,7 @@ static class Program
                 return;
             }
             
-            computer.Dispose();
+            hardwareInfoExtractor.Dispose();
             Environment.Exit(0);
         };
         
@@ -114,8 +88,8 @@ static class Program
         {
             while (!paused)
             {
-                computer.UpdateAllComponents();
-                hardwareStreamer.PulseStream(yamlConfigurationFile.delayStreamTime);   
+                hardwareInfoExtractor.UpdateComputerComponents();
+                hardwareStreamer.PulseStream();   
             }
         }
     }

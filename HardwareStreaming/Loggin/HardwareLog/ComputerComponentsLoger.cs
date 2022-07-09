@@ -1,7 +1,4 @@
-﻿using HardwareStreaming.Enums;
-using HardwareStreaming.Hardware.HardwareUtils;
-
-namespace HardwareStreaming.Loggin.HardwareLog;
+﻿namespace HardwareStreaming.Loggin.HardwareLog;
 
 public class CpuLog : IComponentLog
 {

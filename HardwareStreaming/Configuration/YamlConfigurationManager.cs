@@ -30,24 +30,13 @@ public static class YamlConfigurationManager
     {
         public string Stream(string filePath)
         {
-            int buffersSize = DEFAULT_YAML_CONFIG_FILE_TEMPLATE.Length;
-            
-            using FileStream fileStream = new(filePath, FileMode.Create, FileAccess.Write);
-            using StreamWriter streamWriter = new(fileStream, Encoding.UTF8, buffersSize);
-            streamWriter.Write(DEFAULT_YAML_CONFIG_FILE_TEMPLATE);
-
+            File.WriteAllText(filePath, DEFAULT_YAML_CONFIG_FILE_TEMPLATE);
             return DEFAULT_YAML_CONFIG_FILE_TEMPLATE;
         }
     }
     private class ReadFile : IFileModeStreamer
     {
-        public string Stream(string filePath)
-        {
-            using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
-            using StreamReader streamReader = new(filePath, Encoding.UTF8);
-            
-            return streamReader.ReadToEnd();
-        }
+        public string Stream(string filePath) => File.ReadAllText(filePath);
     }
     #endregion
 

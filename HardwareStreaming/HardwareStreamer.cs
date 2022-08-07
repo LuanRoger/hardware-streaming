@@ -61,7 +61,7 @@ public class HardwareStreamer
 
     public void PulseStream()
     {
-        using var producer = new ProducerBuilder<string, string>(_domain.producerConfig).Build();
+        using var producer = new ProducerBuilder<string, float>(_domain.producerConfig).Build();
         foreach (HardwareCatagory hardware in _hardwareToStream)
         {
             var sensorInfos = _infoExtractor.GetSensorInfos(hardware);

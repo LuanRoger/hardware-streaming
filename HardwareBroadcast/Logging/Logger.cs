@@ -9,7 +9,7 @@ public class Logger : ILogger
         _logger = logger;
     }
     
-    public void LogMessage(string message)
+    public void LogInformation(string message)
     {
         _logger.Information(message);
     }
@@ -19,8 +19,23 @@ public class Logger : ILogger
         _logger.Warning(message);
     }
 
+    public void LogError(string message)
+    {
+        _logger.Error(message);
+    }
+
     public void LogError(Exception exception)
     {
         _logger.Error(exception, exception.Message);
+    }
+
+    public void LogFatal(string message)
+    {
+        _logger.Fatal(message);
+    }
+
+    public void LogFatal(Exception exception)
+    {
+        _logger.Fatal(exception, exception.Message);
     }
 }

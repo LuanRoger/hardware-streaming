@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareStreaming", "Hardwa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareBroadcast", "HardwareBroadcast/HardwareBroadcast.csproj", "{476A4202-517F-4C83-8498-4213DFD2B3AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareStreaming.Internals", "HardwareStreaming.Internals\HardwareStreaming.Internals.csproj", "{6DAD9AC6-D8BF-4DB3-8402-422142D7F3E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{476A4202-517F-4C83-8498-4213DFD2B3AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{476A4202-517F-4C83-8498-4213DFD2B3AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{476A4202-517F-4C83-8498-4213DFD2B3AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DAD9AC6-D8BF-4DB3-8402-422142D7F3E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DAD9AC6-D8BF-4DB3-8402-422142D7F3E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DAD9AC6-D8BF-4DB3-8402-422142D7F3E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DAD9AC6-D8BF-4DB3-8402-422142D7F3E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,5 @@
-﻿using System.Text;
-using HardwareStreaming.Configuration.Models;
-using HardwareStreaming.Loggin;
+﻿using HardwareStreaming.Configuration.Models;
+using HardwareStreaming.Internals.Loggin;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -47,7 +46,7 @@ public static class YamlConfigurationManager
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    public static YamlConfigurationFile? LoadConfigFile(string filePath, ILogger logger, bool create = false)
+    public static YamlConfigurationFile? LoadConfigFile(string filePath, Logger logger, bool create = false)
     {
         bool fileExist = File.Exists(filePath);
         if(!fileExist && !create)

@@ -5,8 +5,9 @@ using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.Constructor;
 using HardwareStreaming.Hardware.HardwareUtils;
-using HardwareStreaming.Loggin;
-using HardwareStreaming.Loggin.HardwareLog;
+using HardwareStreaming.HardwareLog;
+using HardwareStreaming.Internals.Loggin.LogginCore;
+using Logger = HardwareStreaming.Internals.Loggin.Logger;
 
 namespace HardwareStreaming;
 
@@ -17,8 +18,7 @@ static class Program
 
     public static void Main(string[] args)
     {
-        Logger logger = new();
-        logger.InitGlobalLogger();
+        Logger logger = new(new SerilogLogger());
         CmdArgsHandler cmdArgsHandler = new(args);
         ArgsOptions argsOptions = cmdArgsHandler.Parse();
 
@@ -34,7 +34,6 @@ static class Program
         List<HardwareCatagory> monitoringHardware = configurationFile.hardwareMonitoring;
         #region Components Builder
         ComputerBuilder computerBuilder = new();
-        List<IComponentLog> componentLogs = new();
         if(monitoringHardware.Contains(HardwareCatagory.Cpu))
             computerBuilder.InitCPU();
         if(monitoringHardware.Contains(HardwareCatagory.Mainboard))

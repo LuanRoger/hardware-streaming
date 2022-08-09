@@ -1,9 +1,10 @@
-﻿using HardwareStreaming.ArgsHandling;
+﻿using HardwareStreaming.CmdArgs;
 using HardwareStreaming.ConfigurationModels;
 using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.Constructor;
 using HardwareStreaming.Hardware.HardwareUtils;
+using HardwareStreaming.Internals.ArgsParser;
 using HardwareStreaming.Internals.Configuration;
 using HardwareStreaming.Internals.Configuration.ConfigsFormaters.Yaml;
 using HardwareStreaming.Internals.Loggin.LogginCore;
@@ -18,9 +19,20 @@ static class Program
 
     public static void Main(string[] args)
     {
+        //Logger
         Logger logger = new(new SerilogLogger());
+        
+        //CMD args parsing
         CmdArgsHandler cmdArgsHandler = new(args);
-        ArgsOptions argsOptions = cmdArgsHandler.Parse();
+        ArgsOptions? argsOptions = cmdArgsHandler.Parse<ArgsOptions>();
+        if(argsOptions is null)
+        {
+            logger.LogFatal("There is no possible to execute the command." +
+                            "\nArguments parsing failed.");
+            Environment.Exit(1);
+        }
+        
+        //Configuration
         ConfigurationManager<ConfigurationPreferences> configFormater = 
             new(new YamlConfigFormater<ConfigurationPreferences>(), argsOptions.fileConfigPath);
 
@@ -34,7 +46,7 @@ static class Program
         if(yamlConfigurationFile is null)
         {
             logger.LogFatal($"The configuration file don't exist in {argsOptions.fileConfigPath}.");
-            Environment.Exit(1);   
+            Environment.Exit(1);
         }
         configurationFile = yamlConfigurationFile;
 

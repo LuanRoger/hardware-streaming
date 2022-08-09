@@ -1,4 +1,4 @@
-﻿namespace HardwareStreaming.Configuration.Models;
+﻿namespace HardwareStreaming.ConfigurationModels;
 
 public class KafkaDomainConfiguration
 {

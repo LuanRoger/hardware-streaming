@@ -1,11 +1,11 @@
 ﻿using HardwareStreaming.ArgsHandling;
-using HardwareStreaming.Configuration;
-using HardwareStreaming.Configuration.Models;
+using HardwareStreaming.ConfigurationModels;
 using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.Constructor;
 using HardwareStreaming.Hardware.HardwareUtils;
-using HardwareStreaming.HardwareLog;
+using HardwareStreaming.Internals.Configuration;
+using HardwareStreaming.Internals.Configuration.ConfigsFormaters.Yaml;
 using HardwareStreaming.Internals.Loggin.LogginCore;
 using Logger = HardwareStreaming.Internals.Loggin.Logger;
 
@@ -14,24 +14,31 @@ namespace HardwareStreaming;
 static class Program
 {
     private static KafkaDomain kafkaDomain { get; set; } = null!;
-    private static YamlConfigurationFile? configurationFile { get; set; }
+    private static ConfigurationPreferences? configurationFile { get; set; }
 
     public static void Main(string[] args)
     {
         Logger logger = new(new SerilogLogger());
         CmdArgsHandler cmdArgsHandler = new(args);
         ArgsOptions argsOptions = cmdArgsHandler.Parse();
+        ConfigurationManager<ConfigurationPreferences> configFormater = 
+            new(new YamlConfigFormater<ConfigurationPreferences>(), argsOptions.fileConfigPath);
 
-        YamlConfigurationFile? yamlConfigurationFile = YamlConfigurationManager
-            .LoadConfigFile(argsOptions.fileConfigPath, logger, argsOptions.createConfigFile);
+        ConfigurationPreferences? yamlConfigurationFile = 
+            ConfigurationPreferences.CreateConfigurationPreferencesDefaultFactory();
+        
+        if(argsOptions.createConfigFile)
+            configFormater.CreateDefaultConfiguration(yamlConfigurationFile);
+        else yamlConfigurationFile = configFormater.LoadConfiguration();
+        
         if(yamlConfigurationFile is null)
         {
-            logger.LogFatal($"The configuration file don't exist in {argsOptions.fileConfigPath}");
+            logger.LogFatal($"The configuration file don't exist in {argsOptions.fileConfigPath}.");
             Environment.Exit(1);   
         }
         configurationFile = yamlConfigurationFile;
 
-        List<HardwareCatagory> monitoringHardware = configurationFile.hardwareMonitoring;
+        List<HardwareCatagory> monitoringHardware = configurationFile.hardwarePreferences.hardwareMonitoring;
         #region Components Builder
         ComputerBuilder computerBuilder = new();
         if(monitoringHardware.Contains(HardwareCatagory.Cpu))

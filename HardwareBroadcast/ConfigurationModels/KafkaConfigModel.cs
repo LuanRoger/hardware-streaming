@@ -1,4 +1,4 @@
-﻿namespace HardwareBroadcast.Configuration.Models;
+﻿namespace HardwareBroadcast.ConfigurationModels;
 
 public class KafkaConfigModel
 {

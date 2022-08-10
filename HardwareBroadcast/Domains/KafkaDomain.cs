@@ -1,12 +1,11 @@
 ﻿using Confluent.Kafka;
-using HardwareBroadcast.Logging;
-using ILogger = HardwareBroadcast.Logging.ILogger;
+using HardwareStreaming.Internals.Loggin;
 
 namespace HardwareBroadcast.Domains;
 
 public class KafkaDomain
 {
-    private ILogger _logger { get; }
+    private Logger _logger { get; }
     private ConsumerConfig kafkaConfig { get; }
     
     public KafkaDomain(Logger logger, string bootstrapServer, string groupId)

@@ -1,40 +1,58 @@
-﻿using HardwareStreaming.ArgsHandling;
-using HardwareStreaming.Configuration;
-using HardwareStreaming.Configuration.Models;
+﻿using HardwareStreaming.CmdArgs;
+using HardwareStreaming.ConfigurationModels;
 using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.Constructor;
 using HardwareStreaming.Hardware.HardwareUtils;
-using HardwareStreaming.Loggin;
-using HardwareStreaming.Loggin.HardwareLog;
+using HardwareStreaming.Internals.ArgsParser;
+using HardwareStreaming.Internals.Configuration;
+using HardwareStreaming.Internals.Configuration.ConfigsFormaters.Yaml;
+using HardwareStreaming.Internals.Loggin.LogginCore;
+using Logger = HardwareStreaming.Internals.Loggin.Logger;
 
 namespace HardwareStreaming;
 
 static class Program
 {
     private static KafkaDomain kafkaDomain { get; set; } = null!;
-    private static YamlConfigurationFile? configurationFile { get; set; }
+    private static ConfigurationPreferences? configurationFile { get; set; }
 
     public static void Main(string[] args)
     {
-        Logger logger = new();
-        logger.InitGlobalLogger();
+        //Logger
+        Logger logger = new(new SerilogLogger());
+        
+        //CMD args parsing
         CmdArgsHandler cmdArgsHandler = new(args);
-        ArgsOptions argsOptions = cmdArgsHandler.Parse();
+        ArgsOptions? argsOptions = cmdArgsHandler.Parse<ArgsOptions>();
+        if(argsOptions is null)
+        {
+            logger.LogFatal("There is no possible to execute the command." +
+                            "\nArguments parsing failed.");
+            Environment.Exit(1);
+        }
+        
+        //Configuration
+        ConfigurationManager<ConfigurationPreferences> configFormater = 
+            new(new YamlConfigFormater<ConfigurationPreferences>(), argsOptions.fileConfigPath);
 
-        YamlConfigurationFile? yamlConfigurationFile = YamlConfigurationManager
-            .LoadConfigFile(argsOptions.fileConfigPath, logger, argsOptions.createConfigFile);
+        ConfigurationPreferences? yamlConfigurationFile = 
+            ConfigurationPreferences.CreateConfigurationPreferencesDefaultFactory();
+        
+        if(argsOptions.createConfigFile)
+            configFormater.CreateDefaultConfiguration(yamlConfigurationFile);
+        else yamlConfigurationFile = configFormater.LoadConfiguration();
+        
         if(yamlConfigurationFile is null)
         {
-            logger.LogFatal($"The configuration file don't exist in {argsOptions.fileConfigPath}");
-            Environment.Exit(1);   
+            logger.LogFatal($"The configuration file don't exist in {argsOptions.fileConfigPath}.");
+            Environment.Exit(1);
         }
         configurationFile = yamlConfigurationFile;
 
-        List<HardwareCatagory> monitoringHardware = configurationFile.hardwareMonitoring;
+        List<HardwareCatagory> monitoringHardware = configurationFile.hardwarePreferences.hardwareMonitoring;
         #region Components Builder
         ComputerBuilder computerBuilder = new();
-        List<IComponentLog> componentLogs = new();
         if(monitoringHardware.Contains(HardwareCatagory.Cpu))
             computerBuilder.InitCPU();
         if(monitoringHardware.Contains(HardwareCatagory.Mainboard))

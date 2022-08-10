@@ -1,10 +1,12 @@
-﻿namespace HardwareBroadcast.Logging;
+﻿using HardwareStreaming.Internals.Loggin.LogginCore;
 
-public class Logger : ILogger
+namespace HardwareStreaming.Internals.Loggin;
+
+public class Logger
 {
-    private Serilog.Core.Logger _logger { get; }
+    private ILoggerCore _logger { get; }
 
-    public Logger(Serilog.Core.Logger logger)
+    public Logger(ILoggerCore logger)
     {
         _logger = logger;
     }
@@ -14,11 +16,6 @@ public class Logger : ILogger
         _logger.Information(message);
     }
 
-    public void LogWarning(string message)
-    {
-        _logger.Warning(message);
-    }
-
     public void LogError(string message)
     {
         _logger.Error(message);
@@ -26,7 +23,12 @@ public class Logger : ILogger
 
     public void LogError(Exception exception)
     {
-        _logger.Error(exception, exception.Message);
+        _logger.Error(exception);
+    }
+
+    public void LogWarning(string message)
+    {
+        _logger.Warning(message);
     }
 
     public void LogFatal(string message)
@@ -36,6 +38,6 @@ public class Logger : ILogger
 
     public void LogFatal(Exception exception)
     {
-        _logger.Fatal(exception, exception.Message);
+        _logger.Fatal(exception);
     }
 }

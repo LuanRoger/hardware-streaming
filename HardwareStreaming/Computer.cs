@@ -1,7 +1,7 @@
 ﻿using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware;
+using HardwareStreaming.Internals.Loggin;
 using LibreHardwareMonitor.Hardware;
-using ILogger = HardwareStreaming.Loggin.ILogger;
 // ReSharper disable InconsistentNaming
 
 namespace HardwareStreaming;
@@ -9,7 +9,7 @@ namespace HardwareStreaming;
 public class Computer : IDisposable
 {
     private LibreHardwareMonitor.Hardware.Computer _computer { get; }
-    private ILogger _logger { get; }
+    private Logger _logger { get; }
 
     public CPU? cpu { get; set; }
     public Mainboard? mainboard { get; set; }
@@ -19,7 +19,7 @@ public class Computer : IDisposable
     public RAM? ram { get; set; }
     public HDD? hdd { get; set; }
 
-    public Computer(ComputerConfiguration computerConfiguration, ILogger logger)
+    public Computer(ComputerConfiguration computerConfiguration, Logger logger)
     {
         _computer = new()
         {

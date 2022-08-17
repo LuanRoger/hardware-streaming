@@ -1,14 +1,16 @@
 ﻿using Confluent.Kafka;
 using HardwareStreaming.Internals.Loggin;
 
-namespace HardwareBroadcast.Domains;
+namespace HardwareBroadcast.Recivers;
 
-public class KafkaDomain
+public class KafkaReciver
 {
     private Logger _logger { get; }
     private ConsumerConfig kafkaConfig { get; }
+    private string topic { get; }
     
-    public KafkaDomain(Logger logger, string bootstrapServer, string groupId)
+    public KafkaReciver(Logger logger,
+        string bootstrapServer, string topic, string groupId)
     {
         _logger = logger;
         kafkaConfig = new()
@@ -17,17 +19,22 @@ public class KafkaDomain
             GroupId = groupId,
             AutoOffsetReset = AutoOffsetReset.Earliest
         };
+        this.topic = topic;
     }
     
     public void StartConsumeLoop(CancellationToken cancellationToken)
     {
         using var consumer = new ConsumerBuilder<string, float>(kafkaConfig).Build();
-        consumer.Subscribe("hardware_streaming");
+        consumer.Subscribe(topic);
 
         while (!cancellationToken.IsCancellationRequested)
         {
             var message = consumer.Consume(cancellationToken);
-            _logger.LogInformation($"Message consumed: [{message.Message.Key}] - {message.Message.Value}");
+            
+            string key = message.Message.Key;
+            float messageValue = message.Message.Value;
+            
+            _logger.LogInformation($"Message consumed: [{key}] - {messageValue}");
         }
         cancellationToken.ThrowIfCancellationRequested();
         

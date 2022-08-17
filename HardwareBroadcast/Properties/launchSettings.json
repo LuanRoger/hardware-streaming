@@ -15,8 +15,7 @@
       "applicationUrl": "https://localhost:7063;http://localhost:5119",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "commandLineArgs": "-c C:\\Users\\luanr\\Desktop\\hardware_broadcast_config.yaml"
+      }
     },
     "IIS Express": {
       "commandName": "IISExpress",

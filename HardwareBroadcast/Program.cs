@@ -1,6 +1,6 @@
 using HardwareBroadcast.ArgsHandling;
 using HardwareBroadcast.ConfigurationModels;
-using HardwareBroadcast.Domains;
+using HardwareBroadcast.Recivers;
 using HardwareStreaming.Internals.ArgsParser;
 using HardwareStreaming.Internals.Configuration;
 using HardwareStreaming.Internals.Configuration.ConfigsFormaters.Yaml;
@@ -8,7 +8,7 @@ using HardwareStreaming.Internals.Loggin;
 using HardwareStreaming.Internals.Loggin.LogginCore;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 //Logger
 Logger logger = new(new SerilogLogger());
@@ -40,17 +40,17 @@ if(configurationPreferences is null)
 }
 
 //Domain
-KafkaDomain kafkaDomain = new(logger, configurationPreferences.kafkaConfig.bootstrapServer, 
-    configurationPreferences.kafkaConfig.groupId);
+KafkaReciver kafkaReciver = new(logger, configurationPreferences.kafkaConfig.bootstrapServer, 
+     configurationPreferences.kafkaConfig.topic, configurationPreferences.kafkaConfig.groupId);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.MapGet("/", () => Results.Ok());
 
 CancellationTokenSource cancellationTokenSource = new();
 CancellationToken token = cancellationTokenSource.Token;
 
-Task kafkaConsumerTask = Task.Factory.StartNew(() => kafkaDomain.StartConsumeLoop(token));
-Task appRunTask = app.RunAsync(token);
+Task kafkaConsumerTask = Task.Factory.StartNew(() => kafkaReciver.StartConsumeLoop(token));
+Task appRunTask = app.RunAsync(configurationPreferences.apiConfig.appUrl);
 
 Task.WaitAll(kafkaConsumerTask, appRunTask);

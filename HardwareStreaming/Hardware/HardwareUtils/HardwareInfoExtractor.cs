@@ -1,15 +1,15 @@
 ﻿using HardwareStreaming.Enums;
+using HardwareStreaming.Internals.Loggin;
 using LibreHardwareMonitor.Hardware;
-using ILogger = HardwareStreaming.Loggin.ILogger;
 
 namespace HardwareStreaming.Hardware.HardwareUtils;
 
 public class HardwareInfoExtractor : IDisposable
 {
     private Computer mainComputer { get; }
-    private ILogger _logger { get; }
+    private Logger _logger { get; }
 
-    public HardwareInfoExtractor(Computer mainComputer, ILogger logger)
+    public HardwareInfoExtractor(Computer mainComputer, Logger logger)
     {
         this.mainComputer = mainComputer;
         _logger = logger;

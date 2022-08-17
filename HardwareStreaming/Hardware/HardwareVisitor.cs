@@ -1,13 +1,13 @@
-﻿using HardwareStreaming.Loggin;
+﻿using HardwareStreaming.Internals.Loggin;
 using LibreHardwareMonitor.Hardware;
 
 namespace HardwareStreaming.Hardware;
 
 public class HardwareVisitor : IVisitor
 {
-    private ILogger _logger { get; }
+    private Logger _logger { get; }
     
-    public HardwareVisitor(ILogger logger)
+    public HardwareVisitor(Logger logger)
     {
         _logger = logger;
     }

@@ -2,8 +2,8 @@
 using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.HardwareUtils;
-using HardwareStreaming.Loggin;
-using HardwareStreaming.Loggin.HardwareLog;
+using HardwareStreaming.HardwareLog;
+using HardwareStreaming.Internals.Loggin;
 
 namespace HardwareStreaming;
 
@@ -13,9 +13,9 @@ public class HardwareStreamer
     private List<HardwareCatagory> _hardwareToStream { get; }
     private HardwareInfoExtractor _infoExtractor { get; }
     private KafkaDomain _domain { get; }
-    private ILogger _logger { get; }
+    private Logger _logger { get; }
 
-    public HardwareStreamer(ILogger logger, HardwareInfoExtractor infoExtractor,
+    public HardwareStreamer(Logger logger, HardwareInfoExtractor infoExtractor,
         List<HardwareCatagory> hardwareToStream, KafkaDomain domain)
     {
         _logger = logger;
@@ -61,7 +61,7 @@ public class HardwareStreamer
 
     public void PulseStream()
     {
-        using var producer = new ProducerBuilder<string, string>(_domain.producerConfig).Build();
+        using var producer = new ProducerBuilder<string, float>(_domain.producerConfig).Build();
         foreach (HardwareCatagory hardware in _hardwareToStream)
         {
             var sensorInfos = _infoExtractor.GetSensorInfos(hardware);

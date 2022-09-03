@@ -2,7 +2,7 @@
 
 namespace HardwareStreaming.Internals.Loggin;
 
-public class Logger
+public class Logger : ILogger
 {
     private ILoggerCore _logger { get; }
 

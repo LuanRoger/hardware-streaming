@@ -4,7 +4,7 @@ namespace HardwareStreaming.HardwareLog;
 
 public class CpuLog : IComponentLog
 {
-    public void Log(Logger logger, Dictionary<string, float> toStream)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
         logger.LogInformation("===CPU======================");
         foreach ((string key, double value) in toStream)
@@ -14,7 +14,7 @@ public class CpuLog : IComponentLog
 }
 public class MainboardLog : IComponentLog
 {
-    public void Log(Logger logger, Dictionary<string, float> toStream)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
         logger.LogInformation("===Mainboard================");
         foreach ((string key, double value) in toStream)
@@ -24,7 +24,7 @@ public class MainboardLog : IComponentLog
 }
 public class GpuLog : IComponentLog
 {
-    public void Log(Logger logger, Dictionary<string, float> toStream)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
         logger.LogInformation("===GPU======================");
         foreach ((string key, double value) in toStream)
@@ -34,7 +34,7 @@ public class GpuLog : IComponentLog
 }
 public class NetworkLog : IComponentLog
 {
-    public void Log(Logger logger, Dictionary<string, float> toStream)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
         logger.LogInformation("===Network==================");
         foreach ((string key, double value) in toStream)
@@ -44,7 +44,7 @@ public class NetworkLog : IComponentLog
 }
 public class FanContollerLog : IComponentLog
 {
-    public void Log(Logger logger, Dictionary<string, float> toStream)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
         logger.LogInformation("===Fan Controller===========");
         foreach ((string key, double value) in toStream)
@@ -54,7 +54,7 @@ public class FanContollerLog : IComponentLog
 }
 public class RamLog : IComponentLog
 {
-    public void Log(Logger logger, Dictionary<string, float> toStream)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
         logger.LogInformation("===RAM======================");
         foreach ((string key, double value) in toStream)
@@ -64,7 +64,7 @@ public class RamLog : IComponentLog
 }
 public class HddLog : IComponentLog
 {
-    public void Log(Logger logger, Dictionary<string, float> toStream)
+    public void Log(ILogger logger, Dictionary<string, float> toStream)
     {
         logger.LogInformation("===HDD======================");
         foreach ((string key, double value) in toStream)

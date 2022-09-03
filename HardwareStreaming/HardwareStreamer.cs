@@ -13,9 +13,9 @@ public class HardwareStreamer
     private List<HardwareCatagory> _hardwareToStream { get; }
     private HardwareInfoExtractor _infoExtractor { get; }
     private KafkaDomain _domain { get; }
-    private Logger _logger { get; }
+    private ILogger _logger { get; }
 
-    public HardwareStreamer(Logger logger, HardwareInfoExtractor infoExtractor,
+    public HardwareStreamer(ILogger logger, HardwareInfoExtractor infoExtractor,
         List<HardwareCatagory> hardwareToStream, KafkaDomain domain)
     {
         _logger = logger;

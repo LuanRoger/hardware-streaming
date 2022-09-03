@@ -9,7 +9,7 @@ namespace HardwareStreaming;
 public class Computer : IDisposable
 {
     private LibreHardwareMonitor.Hardware.Computer _computer { get; }
-    private Logger _logger { get; }
+    private ILogger _logger { get; }
 
     public CPU? cpu { get; set; }
     public Mainboard? mainboard { get; set; }
@@ -19,7 +19,7 @@ public class Computer : IDisposable
     public RAM? ram { get; set; }
     public HDD? hdd { get; set; }
 
-    public Computer(ComputerConfiguration computerConfiguration, Logger logger)
+    public Computer(ComputerConfiguration computerConfiguration, ILogger logger)
     {
         _computer = new()
         {

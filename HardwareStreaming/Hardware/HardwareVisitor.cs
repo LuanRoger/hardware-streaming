@@ -5,9 +5,9 @@ namespace HardwareStreaming.Hardware;
 
 public class HardwareVisitor : IVisitor
 {
-    private Logger _logger { get; }
+    private ILogger _logger { get; }
     
-    public HardwareVisitor(Logger logger)
+    public HardwareVisitor(ILogger logger)
     {
         _logger = logger;
     }

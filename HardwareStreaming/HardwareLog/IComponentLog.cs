@@ -4,5 +4,5 @@ namespace HardwareStreaming.HardwareLog;
 
 public interface IComponentLog
 {
-    void Log(Logger logger, Dictionary<string, float> toStream);
+    void Log(ILogger logger, Dictionary<string, float> toStream);
 }

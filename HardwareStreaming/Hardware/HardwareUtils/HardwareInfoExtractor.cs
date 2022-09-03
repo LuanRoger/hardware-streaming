@@ -7,9 +7,9 @@ namespace HardwareStreaming.Hardware.HardwareUtils;
 public class HardwareInfoExtractor : IDisposable
 {
     private Computer mainComputer { get; }
-    private Logger _logger { get; }
+    private ILogger _logger { get; }
 
-    public HardwareInfoExtractor(Computer mainComputer, Logger logger)
+    public HardwareInfoExtractor(Computer mainComputer, ILogger logger)
     {
         this.mainComputer = mainComputer;
         _logger = logger;

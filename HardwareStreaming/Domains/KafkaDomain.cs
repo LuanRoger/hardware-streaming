@@ -7,10 +7,10 @@ namespace HardwareStreaming.Domains;
 public class KafkaDomain
 {
     public ProducerConfig producerConfig { get; }
-    private Logger _logger { get; }
+    private ILogger _logger { get; }
     private string kafkaTopic { get; }
 
-    public KafkaDomain(ProducerConfig producerConfig, Logger logger, string kafkaTopicName)
+    public KafkaDomain(ProducerConfig producerConfig, ILogger logger, string kafkaTopicName)
     {
         this.producerConfig = producerConfig;
         _logger = logger;

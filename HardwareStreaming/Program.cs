@@ -7,6 +7,7 @@ using HardwareStreaming.Hardware.HardwareUtils;
 using HardwareStreaming.Internals.ArgsParser;
 using HardwareStreaming.Internals.Configuration;
 using HardwareStreaming.Internals.Configuration.ConfigsFormaters.Yaml;
+using HardwareStreaming.Internals.Loggin;
 using HardwareStreaming.Internals.Loggin.LogginCore;
 using Logger = HardwareStreaming.Internals.Loggin.Logger;
 
@@ -14,13 +15,12 @@ namespace HardwareStreaming;
 
 static class Program
 {
-    private static KafkaDomain kafkaDomain { get; set; } = null!;
     private static ConfigurationPreferences? configurationFile { get; set; }
 
     public static void Main(string[] args)
     {
         //Logger
-        Logger logger = new(new SerilogLogger());
+        ILogger logger = new Logger(new SerilogLogger());
         
         //CMD args parsing
         CmdArgsHandler cmdArgsHandler = new(args);
@@ -69,7 +69,7 @@ static class Program
             computerBuilder.InitHDD();
         #endregion
         
-        kafkaDomain = new(new()
+        KafkaDomain kafkaDomain = new(new()
         {
             BootstrapServers = configurationFile.kafkaDomainConfiguration.bootstrapServer,
             ClientId = configurationFile.kafkaDomainConfiguration.clientId,
@@ -87,10 +87,10 @@ static class Program
             
             Console.WriteLine("Do you want to exit? [y/n] (default: n)");
             ConsoleKeyInfo keyInfo = Console.ReadKey();
-            cancel = keyInfo.Key != ConsoleKey.Y;
+            cancel = keyInfo.Key == ConsoleKey.Y;
             e.Cancel = cancel;
 
-            if (e.Cancel)
+            if (!e.Cancel)
             {
                 paused = false;
                 return;

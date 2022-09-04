@@ -6,7 +6,6 @@ public class ConfigurationPreferences
 {
     public KafkaDomainConfiguration kafkaDomainConfiguration { get; set; }
     public HardwareMonitoringPreferences hardwarePreferences { get; set; }
-    public int delayStreamTime { get; set;}
 
     public static ConfigurationPreferences CreateConfigurationPreferencesDefaultFactory() => new()
     {
@@ -24,8 +23,7 @@ public class ConfigurationPreferences
                 HardwareCatagory.Gpu,
                 HardwareCatagory.Ram
             },
-            tempetureUnit = TempetureUnit.C
-        },
-        delayStreamTime = 1000
+            temperatureUnit = TemperatureUnit.C
+        }
     };
 }

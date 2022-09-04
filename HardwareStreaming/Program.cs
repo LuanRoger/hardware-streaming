@@ -76,7 +76,8 @@ static class Program
         }, logger, configurationFile.kafkaDomainConfiguration.topic);
         
         ComputerConfiguration computerConfiguration = computerBuilder.Build();
-        HardwareInfoExtractor hardwareInfoExtractor = new(new(computerConfiguration, logger), logger);
+        HardwareInfoExtractor hardwareInfoExtractor = new(new(computerConfiguration, logger), 
+            configurationFile.hardwarePreferences.temperatureUnit, logger);
         HardwareStreamer hardwareStreamer = new(logger, hardwareInfoExtractor, monitoringHardware, kafkaDomain);
 
         bool cancel = false;

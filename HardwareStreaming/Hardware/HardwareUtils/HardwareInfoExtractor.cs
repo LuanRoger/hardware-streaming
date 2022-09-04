@@ -1,4 +1,4 @@
-using HardwareStreaming.Enums;
+﻿using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.Models;
 using HardwareStreaming.Internals.Loggin;
 using LibreHardwareMonitor.Hardware;
@@ -9,18 +9,20 @@ public class HardwareInfoExtractor : IDisposable
 {
     private Computer mainComputer { get; }
     private ILogger _logger { get; }
+    private TemperatureUnit sensorDefaultTemperature { get; }
 
-    public HardwareInfoExtractor(Computer mainComputer, ILogger logger)
+    public HardwareInfoExtractor(Computer mainComputer, TemperatureUnit sensorDefaultTemperature, ILogger logger)
     {
         this.mainComputer = mainComputer;
+        this.sensorDefaultTemperature = sensorDefaultTemperature;
         _logger = logger;
     }
     
     public void UpdateComputerComponents() => mainComputer.UpdateAllComponents();
     
-    public Dictionary<string, float> GetSensorInfos(HardwareCatagory hardwareCatagory)
+    public SensorInfo[] GetSensorInfos(HardwareCatagory hardwareCatagory)
     {
-        Dictionary<string, float> nameValueSensor = new();
+        List<SensorInfo> nameValueSensor = new();
 
         switch (hardwareCatagory)
         {
@@ -28,71 +30,67 @@ public class HardwareInfoExtractor : IDisposable
                 if(mainComputer.cpu is null) break;
                 
                 foreach (ISensor sensor in mainComputer.cpu.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, sensor.Value ?? -1.0f); }
-                    catch(Exception e) { _logger.LogWarning(e.Message); }
-                }
+                    nameValueSensor.Add(CreateConcreateSensor(sensor));
+                
                 break;
             case HardwareCatagory.Mainboard:
                 if(mainComputer.mainboard is null) break;
                 
                 foreach (ISensor sensor in mainComputer.mainboard.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, sensor.Value ?? -1.0f); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
+                    nameValueSensor.Add(CreateConcreateSensor(sensor));
+                
                 break;
             case HardwareCatagory.Gpu:
                 if(mainComputer.gpu is null) break;
                 
                 foreach (ISensor sensor in mainComputer.gpu.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, sensor.Value ?? -1.0f); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
+                    nameValueSensor.Add(CreateConcreateSensor(sensor));
                 break;
             case HardwareCatagory.Network:
                 if(mainComputer.network is null) break;
                 
                 foreach (ISensor sensor in mainComputer.network.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, sensor.Value ?? -1.0f); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
+                    nameValueSensor.Add(CreateConcreateSensor(sensor));
+                
                 break;
             case HardwareCatagory.FanController:
                 if(mainComputer.fanController is null) break;
                 
                 foreach (ISensor sensor in mainComputer.fanController.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, sensor.Value ?? -1.0f); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
+                    nameValueSensor.Add(CreateConcreateSensor(sensor));
+                
                 break;
             case HardwareCatagory.Ram:
                 if(mainComputer.ram is null) break;
                 
                 foreach (ISensor sensor in mainComputer.ram.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, sensor.Value ?? -0.1f); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
+                    nameValueSensor.Add(CreateConcreateSensor(sensor));
+                
                 break;
             case HardwareCatagory.Hdd:
                 if(mainComputer.hdd is null) break;
                 
                 foreach (ISensor sensor in mainComputer.hdd.sensors)
-                {
-                    try { nameValueSensor.Add(sensor.Name, sensor.Value ?? -0.1f); }
-                    catch (Exception e) { _logger.LogWarning(e.Message);}
-                }
+                    nameValueSensor.Add(CreateConcreateSensor(sensor));
+                
                 break;
             default:
                 _logger.LogError($"{nameof(hardwareCatagory)} is null");
                 break;
         }
         
-        return nameValueSensor; 
+        return nameValueSensor.ToArray(); 
+    }
+    
+    private SensorInfo CreateConcreateSensor(ISensor sensor)
+    {
+        if(sensor.SensorType == SensorType.Temperature)
+            return new TemperatureSensorInfo(sensor.Name, sensor.Value ?? -1.0f,
+                (SensorDataType)(int)sensor.SensorType, sensorDefaultTemperature);
+        
+        //Default generic sensor
+        return new(sensor.Name, sensor.Value ?? -1.0f,
+            (SensorDataType)(int)sensor.SensorType);
     }
     
     public void Dispose()

@@ -2,6 +2,7 @@
 using HardwareStreaming.Domains;
 using HardwareStreaming.Enums;
 using HardwareStreaming.Hardware.HardwareUtils;
+using HardwareStreaming.Hardware.Models;
 using HardwareStreaming.HardwareLog;
 using HardwareStreaming.Internals.Loggin;
 
@@ -65,10 +66,10 @@ public class HardwareStreamer
         foreach (HardwareCatagory hardware in _hardwareToStream)
         {
             var sensorInfos = _infoExtractor.GetSensorInfos(hardware);
-            
+
             _componentsLog[hardware].Log(_logger, sensorInfos);
-            foreach (var sensorInfo in sensorInfos)
-                _domain.StreamInfo(sensorInfo, in producer);
+            foreach (SensorInfo sensorInfo in sensorInfos)
+                _domain.StreamInfo(new(sensorInfo.name, sensorInfo.value), in producer);
             
             producer.Flush();
         }

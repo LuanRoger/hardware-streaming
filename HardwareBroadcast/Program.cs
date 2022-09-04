@@ -1,4 +1,4 @@
-using HardwareBroadcast.ArgsHandling;
+using HardwareBroadcast.CmdArgs;
 using HardwareBroadcast.ConfigurationModels;
 using HardwareBroadcast.Recivers;
 using HardwareStreaming.Internals.ArgsParser;
@@ -40,8 +40,8 @@ if(configurationPreferences is null)
 }
 
 //Domain
-KafkaReciver kafkaReciver = new(logger, configurationPreferences.kafkaConfig.bootstrapServer, 
-     configurationPreferences.kafkaConfig.topic, configurationPreferences.kafkaConfig.groupId);
+KafkaReciver kafkaReciver = new(logger, configurationPreferences.kafkaReciverConfiguration.bootstrapServer, 
+     configurationPreferences.kafkaReciverConfiguration.topic, configurationPreferences.kafkaReciverConfiguration.groupId);
 
 WebApplication app = builder.Build();
 

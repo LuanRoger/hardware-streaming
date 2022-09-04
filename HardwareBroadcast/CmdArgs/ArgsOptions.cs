@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace HardwareBroadcast.ArgsHandling;
+namespace HardwareBroadcast.CmdArgs;
 
 public class ArgsOptions
 {

@@ -1,4 +1,5 @@
-﻿using HardwareStreaming.Enums;
+using HardwareStreaming.Enums;
+using HardwareStreaming.Hardware.Models;
 using HardwareStreaming.Internals.Loggin;
 using LibreHardwareMonitor.Hardware;
 

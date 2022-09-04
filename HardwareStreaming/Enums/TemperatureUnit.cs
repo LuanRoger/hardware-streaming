@@ -1,6 +1,6 @@
 ﻿namespace HardwareStreaming.Enums;
 
-public enum TempetureUnit
+public enum TemperatureUnit
 {
     C, K, F
 }

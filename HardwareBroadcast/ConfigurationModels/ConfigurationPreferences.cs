@@ -3,7 +3,7 @@
 public class ConfigurationPreferences
 {
     public ApiConfigModel apiConfig { get; set; }
-    public KafkaConfigModel kafkaConfig { get; set; }
+    public KafkaReciverConfiguration kafkaReciverConfiguration { get; set; }
     
     public static ConfigurationPreferences FactoryCreateDefault()  => new()
     {
@@ -11,7 +11,7 @@ public class ConfigurationPreferences
         {
             appUrl = "localhost:7063"
         },
-        kafkaConfig = new()
+        kafkaReciverConfiguration = new()
         {
             bootstrapServer = "localhost:9092",
             topic = "hardware_streaming",

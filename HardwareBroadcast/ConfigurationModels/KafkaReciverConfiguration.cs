@@ -1,6 +1,6 @@
 ﻿namespace HardwareBroadcast.ConfigurationModels;
 
-public class KafkaConfigModel
+public class KafkaReciverConfiguration
 {
     public string bootstrapServer { get; set; }
     public string groupId { get; set; }

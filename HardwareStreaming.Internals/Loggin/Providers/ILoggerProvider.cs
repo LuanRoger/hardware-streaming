@@ -1,6 +1,6 @@
-﻿namespace HardwareStreaming.Internals.Loggin.LogginCore;
+﻿namespace HardwareStreaming.Internals.Loggin.Providers;
 
-public interface ILoggerCore
+public interface ILoggerProvider
 {
     void Information(string message);
     void Warning(string message);

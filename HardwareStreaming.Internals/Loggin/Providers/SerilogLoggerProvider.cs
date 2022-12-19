@@ -1,14 +1,18 @@
 ﻿using Serilog;
 
-namespace HardwareStreaming.Internals.Loggin.LogginCore;
+namespace HardwareStreaming.Internals.Loggin.Providers;
 
-public class SerilogLogger : ILoggerCore
+public class SerilogLoggerProvider : ILoggerProvider
 {
     private Serilog.Core.Logger _logger { get; }
     
-    public SerilogLogger()
+    public SerilogLoggerProvider()
     {
         _logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+    }
+    public SerilogLoggerProvider(Serilog.Core.Logger logger)
+    {
+        _logger = logger;
     }
 
     public void Information(string message)

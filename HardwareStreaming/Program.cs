@@ -8,7 +8,7 @@ using HardwareStreaming.Internals.ArgsParser;
 using HardwareStreaming.Internals.Configuration;
 using HardwareStreaming.Internals.Configuration.ConfigsFormaters.Yaml;
 using HardwareStreaming.Internals.Loggin;
-using HardwareStreaming.Internals.Loggin.LogginCore;
+using HardwareStreaming.Internals.Loggin.Providers;
 using Logger = HardwareStreaming.Internals.Loggin.Logger;
 
 namespace HardwareStreaming;
@@ -20,7 +20,7 @@ static class Program
     public static void Main(string[] args)
     {
         //Logger
-        ILogger logger = new Logger(new SerilogLogger());
+        ILogger logger = new Logger(new SerilogLoggerProvider());
         
         //CMD args parsing
         CmdArgsHandler cmdArgsHandler = new(args);

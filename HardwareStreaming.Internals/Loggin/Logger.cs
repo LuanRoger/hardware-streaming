@@ -1,14 +1,18 @@
-﻿using HardwareStreaming.Internals.Loggin.LogginCore;
+﻿using HardwareStreaming.Internals.Loggin.Providers;
 
 namespace HardwareStreaming.Internals.Loggin;
 
 public class Logger : ILogger
 {
-    private ILoggerCore _logger { get; }
+    private ILoggerProvider _logger { get; }
 
-    public Logger(ILoggerCore logger)
+    public Logger(ILoggerProvider logger)
     {
         _logger = logger;
+    }
+    public Logger(Serilog.Core.Logger logger)
+    {
+        _logger = new SerilogLoggerProvider(logger);
     }
     
     public void LogInformation(string message)
